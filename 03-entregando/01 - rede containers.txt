@@ -1,0 +1,16 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - REDE CONTAINERS
+====================================================================================================
+
+
+Criando uma rede docker
+----------------------------------------------------------------------------------------------------
+- Criar uma rede para o projeto payroll-suite
+
+  $ docker network create --driver bridge payroll-network
+  
+- Verificando a rede
+
+  $ docker network ls
+
+

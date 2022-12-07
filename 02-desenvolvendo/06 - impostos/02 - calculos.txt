@@ -1,0 +1,120 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - IMPOSTOS SERVICE - CALCULOS
+====================================================================================================
+
+
+Criando os clientes feign
+----------------------------------------------------------------------------------------------------
+- Adicionar a dependência do OpenFeign
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+      <version>3.1.4</version> 
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte anotação na classe 'StartApplication'
+
+  ...
+  @EnableFeignClients
+  ...
+      
+
+- Criar o pacote 'com.ctseducare.impostos.feignclient'
+
+
+- Criar o cliente para fgts service
+
+@FeignClient(name="service-fgts", url = "localhost:8081")
+public interface FgtsFeignClient {
+
+    @GetMapping("/fgts/employee/{id}")
+    Double calcularFgts(@PathVariable Integer id);
+
+}
+
+
+- Criar o cliente para o inss service
+
+@FeignClient(name="service-inss", url = "localhost:8082")
+public interface InssFeignClient {
+
+    @GetMapping("/inss/employee/{id}")
+    Double calcularInss(@PathVariable Integer id);
+
+}
+
+
+- Criar o pacote 'com.ctseducare.impostos.dto'
+
+- Criar a classe ImpostosDTO
+
+public class ImpostosDTO {
+
+    private Integer employeeId;
+    private Double fgts;
+    private Double inss;
+    
+    // Construtores
+    
+    // Getters e Setters
+    
+}
+
+
+- Criar o pacote 'com.ctseducare.impostos.service'
+
+
+- Criar a classe 'ImpostosService'
+
+@Service
+public class ImpostosService {
+    
+    @Autowired FgtsFeignClient fgtsClient;
+    @Autowired InssFeignClient inssClient;
+    
+    public ImpostosDTO calcularImpostos(Integer employeeId) {
+        double fgts = fgtsClient.calcularFgts(employeeId);
+        double inss = inssClient.calcularInss(employeeId);
+        
+        return new ImpostosDTO(employeeId, fgts, inss);
+    }
+
+}
+
+
+- Alterar o 'ImpostosController'
+
+@RestController
+@RequestMapping(path = "/impostos")
+public class ImpostosController {
+
+    @Autowired
+    private ImpostosService service;
+
+    @GetMapping("/employee/{employeeId}")
+    ResponseEntity<ImpostosDTO> calcularImpostos(@PathVariable Integer employeeId) {
+        return ResponseEntity.ok(service.calcularImpostos(employeeId));
+    }
+
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'employee', 'fgts', 'inss' e 'impostos'
+
+- No Postman criar uma chamada para o endereço http://localhost:8083/impostos/employee/{EMPLOYEE-ID}
+
+  Obs: Será exibido o seguinte resultado
+  
+  {
+    "employeeId": {EMPLOYEE-ID},
+    "fgts": XXX.X,
+    "inss": YYY.Y
+  }
+
+

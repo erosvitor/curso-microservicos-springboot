@@ -1,0 +1,222 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE
+====================================================================================================
+
+
+Módulo Employee
+----------------------------------------------------------------------------------------------------
+- Selecionar o projeto 'payroll-suite' e clicar em File > New > Other > Maven Module
+
+- Marcar a opção 'Create a simple project'
+
+- Digitar 'employee' no campo 'Module name' e clicar no botão 'Finish'
+
+- Adicionar a dependência 'starter web' no arquivo 'pom.xml'
+
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+  </dependencies>
+  ...
+
+
+StartApplication
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee'
+
+- Criar a classe 'StartApplication'
+
+@SpringBootApplication
+public class StartApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(StartApplication.class, args);
+  }
+  
+}
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee.controller'
+
+- Criar a classe 'EmployeeController'
+
+@RestController
+public class EmployeeController {
+
+  @GetMapping
+  String status() {
+    return "I am up!";
+  }
+  
+}
+
+
+Porta serviço
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application.yml' dentro da pasta 'src/main/resources'
+
+  server:
+    port:8080
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'employee'
+
+- Usando um navegador, acessar o endereço http://localhost:8080
+
+  Obs: Será exibida a mensagem 'I am up!'
+
+
+Database
+----------------------------------------------------------------------------------------------------
+- Adicionar as dependências
+
+    ...
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-data-jpa</artifactId>
+    </dependency>
+    <dependency>
+      <groupId>mysql</groupId>
+      <artifactId>mysql-connector-java</artifactId>
+      <scope>runtime</scope>
+    </dependency>
+    ...
+
+  OBS: Para quem utiliza STS, seguir os passos abaixo:
+  
+    - Selecionar o projeto 'employee', com botão direito selecionar Spring > Add Starters
+    
+    - Selecionar Spring Data JPA e MySQL Driver e clicar no botão 'Next'
+
+- Adicionar as seguintes linhas no arquivo 'application.yml'
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/payroll
+    username: root
+    password: root
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none    
+
+
+Model
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee.model'
+
+- Criar a classe 'Employee'
+
+@Entity
+@Table(name = "employees")
+public class Employee implements Serializable {
+
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
+  private String name;
+  private Double salary;
+  private LocalDate birthday;
+  @OneToMany(mappedBy = "employee", cascade = CascadeType.ALL, fetch = FetchType.LAZY)
+  private Set<EmployeeDependent> dependents = new HashSet<>(0);
+
+  // Construtores
+  
+  // Getters and Setters
+
+}
+
+
+- Criar a classe EmployeeDependent
+
+@Entity
+@Table(name = "employees_dependents")
+public class EmployeeDependent implements Serializable {
+  
+  @Id
+  @GeneratedValue(strategy = GenerationType.IDENTITY)
+  private Integer id;
+  private String name;
+  private LocalDate birthday;
+  @ManyToOne
+  @JoinColumn(name = "id_employee")
+  private Employee employee;
+  
+  // Construtores
+  
+  // Getters and Setters
+
+}
+
+
+Repositório
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee.repository'
+
+- Criar a interface 'EmployeeRepository' conforme abaixo
+
+public interface EmployeeRepository extends JpaRepository<Employee, Integer> {
+
+}
+
+
+DTOs
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee.dto'
+
+- Criar a classe 'EmployeeDTO'
+
+public class EmployeeDTO {
+
+  private Integer id;
+  private String name;
+  private Double salary;
+  private LocalDate birthday;
+  private List<EmployeeDependentDTO> dependents = new ArrayList<>(0);
+
+  // Construtores
+  
+  // Getters and Setters
+
+}
+
+- Criar a classe 'EmployeeDependentDTO'
+
+public class EmployeeDependentDTO {
+
+  private Integer id;
+  private String name;
+  private LocalDate birthday;
+  
+  // Construtores
+
+  // Getters and Setters
+
+}
+
+
+Serviço
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.employee.service'
+
+- Criar a classe 'EmployeeService'
+
+@Service
+public class EmployeeService {
+
+  @Autowired
+  EmployeeRepository repository;
+  
+}
+
+

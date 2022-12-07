@@ -1,0 +1,113 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - FGTS SERVICE - CALCULO INSS
+====================================================================================================
+
+Consumindo o endpoint para pegar o salário do funcionário
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+      <version>3.1.4</version> 
+    </dependency>
+    ...
+
+
+- Adicionar a annotation na classe 'StartApplication'
+
+  ...
+  @EnableFeignClients
+  ...
+      
+
+- Criar o pacote 'com.ctseducare.inss.feignclient'
+
+
+- Criar a classe 'EmployeeFeignClient'
+
+@FeignClient(name="service-employee", url = "localhost:8080")
+public interface EmployeeFeignClient {
+
+    @GetMapping("/employee/{id}/salary")
+    Double findSalary(@PathVariable Integer id);
+
+}
+
+
+- Criar o pacote 'com.ctseducare.inss.service'
+
+
+- Criar a classe 'InssService'
+
+@Service
+public class InssService {
+
+    @Autowired
+    EmployeeFeignClient employee;
+
+    public Double calcularInss(Integer employeeId) {
+        double salary = employee.findSalary(employeeId).doubleValue();
+        return inss(salary);
+    }
+
+    private double inss(double salary) {
+        double rateRange1 = 7.5 / 100.0;
+        double rateRange2 = 9.0 / 100.0;
+        double rateRange3 = 12.0 / 100.0;
+        double rateRange4 = 14.0 / 100.0;
+
+        double inss = 0.0;
+
+        if (salary <= 1212.00) {
+            inss = salary * rateRange1;
+
+        } else if (salary <= 2427.35) {
+            inss = 1212.00 * rateRange1;
+            inss += (salary - 1212.00) * rateRange2;
+
+        } else if (salary <= 3641.03) {
+            inss = 1212.00 * rateRange1;
+            inss += (2427.35 - 1212.00) * rateRange2;
+            inss += (salary - 2427.35) * rateRange3;
+
+        } else if (salary <= 7087.22) {
+            inss = 1212.00 * rateRange1;
+            inss += (2427.35 - 1212.00) * rateRange2;
+            inss += (3641.03 - 2427.35) * rateRange3;
+            inss += (salary - 3641.03) * rateRange4;
+        } else {
+            inss = 828.39;
+        }
+
+        return inss;
+    }
+
+}
+
+
+- Alterar o controller 'InssController'
+
+@RestController
+@RequestMapping(path = "/inss")
+public class InssController {
+  
+  @Autowired
+  private InssService service;
+
+  @GetMapping("/employee/{employeeId}")
+  Double calcularInss(@PathVariable Integer employeeId) {
+    return service.calcularInss(employeeId);
+  }
+  
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'employee' e 'inss'
+
+- No Postman criar uma chamada para o endereço http://localhost:8082/inss/employee/{EMPLOYEE-ID}
+
+

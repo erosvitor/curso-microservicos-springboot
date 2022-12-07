@@ -1,0 +1,335 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - SERVICE REGISTRY - CLIENTS
+====================================================================================================
+
+
+Configurando o 'employee' para ser um cliente do service registry
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte annotation na classe 'StartApplicatioon'
+
+  ...
+  @EnableEurekaClient
+  ...
+
+
+- Alterar a porta do serviço para que fique dinâmica
+
+  server.port=${PORT:0}
+  
+  ou
+  
+  server:
+    port: ${PORT:0}
+  
+
+- Configurar o nome do serviço
+
+  spring.application.name=service-employee
+  
+  ou
+  
+  spring:
+    application:
+      name: service-employee
+
+
+- Configurar a conexão com o service registry
+
+  # Discovery client
+  eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  eureka.instance.instance-id=${spring.application.name}
+  eureka.instance.preferIpAddress=true
+  
+  ou
+  
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}
+      preferIpAddress: true      
+  
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'registry' e 'employee'
+
+- Usando um navegador, acessar o endereço http://localhost:8761
+  
+  ATENÇÃO!
+  - Ao accessar o 'employee' service usando o endereço http://localhost:8080/employee será gerado
+    uma exceção
+  - Deve-se substituir a porta 8080 pela porta que o service registry atribuiu ao serviço 'employee'
+
+
+Configurando o 'fgts' para ser um cliente do service registry
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte annotation na classe 'StartApplicatioon'
+
+  ...
+  @EnableEurekaClient
+  ...
+
+
+- Alterar a porta do serviço para que fique dinâmica
+
+  server.port=${PORT:0}
+
+  ou
+  
+  server:
+    port: ${PORT:0}
+  
+
+- Configurar o nome do serviço
+
+  spring.application.name=service-fgts
+
+  ou
+  
+  spring:
+    application:
+      name: service-fgts
+
+
+- Configurar a conexão com o service registry
+
+  # Discovery client
+  eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  eureka.instance.instance-id=${spring.application.name}
+  eureka.instance.preferIpAddress=true
+  
+  ou
+  
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}
+      preferIpAddress: true      
+  
+
+- Retirar a configuração do host e porta do cliente Feign
+
+  ...
+  @FeignClient(name="service-employee")
+  public interface EmployeeFeignClient {
+    
+      @GetMapping("/employee/{id}/salary")
+      Double findSalary(@PathVariable Integer id);
+
+  }
+  ...
+  
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'discovery', 'employee' e 'fgts'
+
+- Usando um navegador, acessar o endereço http://localhost:8761
+
+  ATENÇÃO!
+  - Ao acessar o serviço 'fgts' usando o endereço http://localhost:8081/fgts/employee será
+    gerado uma exceção
+  - Deve-se substituir a porta 8081 pela porta que o service registry atribuiu ao serviço 'fgts'
+
+
+Configurando o 'inss' para ser um cliente do service registry
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte annotation na classe 'StartApplicatioon'
+
+  ...
+  @EnableEurekaClient
+  ...
+
+
+- Alterar a porta do serviço para que fique dinâmica
+
+  server.port=${PORT:0}
+  
+  ou
+  
+  server:
+    port: ${PORT:0}
+
+- Configurar o nome do serviço
+
+  spring.application.name=service-inss
+  
+  ou
+
+  spring:
+    application:
+      name: service-inss
+
+
+- Configurar a conexão com o service registry
+
+  # Discovery client
+  eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  eureka.instance.instance-id=${spring.application.name}
+  eureka.instance.preferIpAddress=true
+  
+  ou
+  
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}
+      preferIpAddress: true      
+
+
+- Retirar a configuração do host e porta do cliente Feign
+
+  ...
+  @FeignClient(name="service-employee")
+  public interface EmployeeFeignClient {
+    
+      @GetMapping("/employee/{id}/salary")
+      Double findSalary(@PathVariable Integer id);
+
+  }
+  ...
+  
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'registry', 'employee', 'fgts' e 'inss'
+
+- Usando um navegador, acessar o endereço http://localhost:8761
+
+  ATENÇÂO!
+  - Ao accessar o serviço 'inss' usando o endereço http://localhost:8082/inss/employee será gerado uma exceção
+  - Deve-se substituir a porta 8082 pela porta que o service registry atribuiu ao serviço 'inss'
+
+
+Configurando o 'impostos' para ser um cliente do service registry
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte annotation na classe 'StartApplicatioon'
+
+  ...
+  @EnableEurekaClient
+  ...
+
+
+- Alterar a porta do serviço para que fique dinâmica
+
+  server.port=${PORT:0}
+  
+  ou
+  
+  server:
+    port: ${PORT:0}
+  
+
+- Configurar o nome do serviço
+
+  spring.application.name=service-impostos
+  
+  ou
+  
+  spring:
+    application:
+      name: service-impostos
+
+
+- Configurar a conexão com o service registry
+
+  # Discovery client
+  eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  eureka.instance.instance-id=${spring.application.name}
+  eureka.instance.preferIpAddress=true
+  
+  ou
+  
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}
+      preferIpAddress: true      
+
+
+- Retirar a configuração do host e porta dos clientes Feign
+
+  ...
+  @FeignClient(name="service-fgts")
+  public interface FgtsFeignClient {
+
+      @GetMapping("/fgts/employee/{id}")
+      Double calcularFgts(@PathVariable Integer id);
+
+  }
+  ...
+  
+  ...
+  @FeignClient(name="service-inss")
+  public interface InssFeignClient {
+
+      @GetMapping("/inss/employee/{id}")
+      Double calcularInss(@PathVariable Integer id);
+
+  }
+  ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'registry', 'employee', 'fgts', 'inss' e 'impostos'
+
+- Usando um navegador, acessar o endereço http://localhost:8761
+
+  ATENÇÂO!
+  - Ao accessar o serviço 'impostos' usando o endereço http://localhost:8083/impostos/employee será gerado uma exceção
+  - Deve-se substituir a porta 8083 pela porta que o service registry atribuiu ao service 'inss'
+
+

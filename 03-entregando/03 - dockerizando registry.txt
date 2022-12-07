@@ -1,0 +1,59 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - DOCKERIZANDO SERVIÇO REGISTRY
+====================================================================================================
+
+
+Criando o Dockerfile
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'Dockerfile' dentro da pasta 'registry'
+
+FROM openjdk:17
+VOLUME /tmp
+EXPOSE 8761
+COPY ./target/registry-0.0.1-SNAPSHOT.jar registry.jar
+ENTRYPOINT ["java", "-jar", "/registry.jar"]
+
+
+Criando o shell script
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'create-container.sh' dentro da pasta 'registry'
+
+#!/bin/bash
+
+imagename="registry-payroll:1.0"
+containername="registry-payroll"
+volumedir="registry-payroll"
+
+#################################################################################
+# Building image
+#################################################################################
+docker image build -t ${imagename} .
+
+#################################################################################
+# Running container
+#################################################################################
+docker container run \
+  --detach \
+  --restart always \
+  --network payroll-network \
+  -p 8761:8761 \
+  --name ${containername} \
+  ${imagename}
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+  ATENÇÃO!!!
+  - Será exibida uma mensagem de erro informando que o 'discovery-0.0.1-SNAPSHOT.jar' não foi encontrado
+  
+  ...
+  Step 4/5 : COPY ./target/registry-0.0.1-SNAPSHOT.jar registry.jar
+  COPY failed: file not found in build context or excluded by .dockerignore: stat target/registry-0.0.1-SNAPSHOT.jar: file does not exist
+  Unable to find image 'registry-payroll:1.0' locally
+  ...  
+
+

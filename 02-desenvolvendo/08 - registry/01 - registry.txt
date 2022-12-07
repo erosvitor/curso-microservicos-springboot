@@ -1,0 +1,73 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - SERVICE REGISTRY
+====================================================================================================
+
+
+Criando o módulo registry
+----------------------------------------------------------------------------------------------------
+- Selecionar o projeto 'payroll-suite' e clicar em File > New > Other > Maven Module
+
+- Marcar a opção 'Create a simple project'
+
+- Digitar 'registry' no campo 'Module name' e clicar no botão 'Finish'
+
+- Adicionar a dependência 'starter web' no arquivo 'pom.xml'
+
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-server</artifactId>
+      <version>3.1.4</version>
+    </dependency>  
+  </dependencies>
+  ...
+
+
+StartApplication
+----------------------------------------------------------------------------------------------------  
+- Criar o pacote 'com.ctseducare.registry'
+
+- Criar a classe 'StartApplication'
+
+@SpringBootApplication
+@EnableEurekaServer
+public class StartApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(StartApplication.class, args);
+  }
+  
+}
+
+
+Configurando o registry
+----------------------------------------------------------------------------------------------------  
+- Adicionar as seguintes linhas no arquivo application.properties (ou no application.yml)
+
+  server.port=8761
+  spring.application.name=service-registry
+  eureka.client.register-with-eureka=false
+  eureka.client.fetch-registry=false
+  
+  ou
+  
+  server:
+    port: 8761
+  
+  spring:
+    application.name: service-registry
+  
+  eureka:
+    client:
+      register-with-eureka: false
+      fetch-registry: false
+  
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'registry'
+
+- Usando um navegador, acessar o endereço http://localhost:8761
+
+

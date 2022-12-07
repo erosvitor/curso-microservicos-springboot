@@ -1,0 +1,103 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - API GATEWAY
+====================================================================================================
+
+
+Criando o API Gateway
+----------------------------------------------------------------------------------------------------
+- Selecionar o projeto 'payroll-suite' e clicar em File > New > Other > Maven Module
+
+- Marcar a opção 'Create a simple project'
+
+- Digitar 'gateway' no campo 'Module name' e clicar no botão 'Finish'
+
+- Adicionar a dependência 'starter web' no arquivo 'pom.xml'
+
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-gateway</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-netflix-eureka-client</artifactId>
+      <version>3.1.4</version>
+    </dependency>
+  </dependencies>
+  ...
+
+
+StartApplication
+----------------------------------------------------------------------------------------------------  
+- Criar o pacote 'com.ctseducare.gateway'
+
+- Criar a classe 'StartApplication'
+
+@SpringBootApplication
+@EnableEurekaClient
+public class StartApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(StartApplication.class, args);
+  }
+  
+}
+
+
+Configurando o gateway
+----------------------------------------------------------------------------------------------------  
+- Adicionar as seguintes linhas no arquivo application.properties (ou no application.yml)
+
+  server.port=8888
+  spring.application.name=service-gateway
+  
+  eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  eureka.instance.instance-id=${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+  ou
+  
+  server:
+    port: 8888
+  
+  spring:
+    application:
+      name: service-gateway
+  
+  eureka:
+    client:
+      service-url:
+        defaultZone: http://localhost:8761/eureka
+    instance:
+      instance-id: ${spring.application.name}:${spring.application.instance_id:${random.value}}
+
+
+Configurando rotas
+----------------------------------------------------------------------------------------------------  
+- Criar o pacote 'com.ctseducare.gateway.config'
+
+- Criar a classe 'RoutesConfig'
+
+@Configuration
+public class RoutesConfig {
+
+  @Bean
+  public RouteLocator gatewayRoutes(RouteLocatorBuilder builder) {
+    return builder
+            .routes()
+            .route(r -> r.path("/employee/**").uri("lb://SERVICE-EMPLOYEE"))
+            .route(r -> r.path("/impostos/**").uri("lb://SERVICE-IMPOSTOS"))
+            .build();
+  }
+
+}
+  
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'gateway'
+
+- No Postman, alterar todas as portas das requisições para 8888
+
+

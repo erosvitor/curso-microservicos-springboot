@@ -1,0 +1,77 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - PROBLEMAS 1
+====================================================================================================
+
+
+Problemas
+----------------------------------------------------------------------------------------------------
+- Repetição de código
+- Variáveis desnecessárias
+- Endpoint para excluir retorna uma resposta diferente
+
+  
+Solução
+----------------------------------------------------------------------------------------------------
+- Aplicar técnicas de Clean Code (SOLID, DRY, YAGNI, KISS)
+- Padronizar respostas dos endpoints
+
+
+Clean Code
+----------------------------------------------------------------------------------------------------
+Um código limpo é um código visivilmente bem alinhado, logicamente bem estruturado, fácil de ler e
+entender.
+
+
+Técnicas Clean Code
+----------------------------------------------------------------------------------------------------
+- Nomenclatura padronizada
+- Uso de nomes significativos
+- Funções pequenas
+- Funções com apenas uma responsabilidade
+- Funções com no máximo três parâmetros
+- Comentários apenas quando a função não consegue dizer o que ela faz
+- Exceções no lugar de códigos de erro
+- Princípios de design
+
+
+Princípios de design
+----------------------------------------------------------------------------------------------------
+- SOLID
+- DRY
+- YAGNI
+- KISS
+
+
+SOLID
+----------------------------------------------------------------------------------------------------
+- Single Responsibility Principle
+- Open-Closed Principle
+- Liskov Substitution Principle
+- Interface Segregation Principle
+- Dependency Inversion Principle
+
+
+DRY
+----------------------------------------------------------------------------------------------------
+- Don't Repeat Yourself
+- Não repetir código
+
+
+YAGNI
+----------------------------------------------------------------------------------------------------
+- You ain't gonna need it
+- Implementar somente o que for utilizar
+- Remover códigos comentados (para isso que serve versionamento de código)
+- Retirar tudo o que não está sendo usado
+- Não criar código "achando" que uma dia vai precisar dele
+
+
+KISS
+----------------------------------------------------------------------------------------------------
+- Keep It Simple Stupid
+- Manter o código mais simples possível
+- Simples significa
+  - Fácil de ler e entender
+  - Poucas linhas
+
+

@@ -1,0 +1,159 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - DOCKERIZANDO SERVIÇO EMPLOYEE
+====================================================================================================
+
+
+Criando o Dockerfile
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'Dockerfile' dentro da pasta 'employee'
+
+FROM openjdk:17
+VOLUME /tmp
+COPY ./target/employee-0.0.1-SNAPSHOT.jar employee.jar
+ENTRYPOINT ["java", "-jar", "/employee.jar"]
+
+
+Criando o shell script
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'create-container.sh' dentro da pasta 'employee'
+
+#!/bin/bash
+
+imagename="employee-payroll:1.0"
+containername="employee-payroll"
+volumedir="employee-payroll"
+
+#################################################################################
+# Building image
+#################################################################################
+docker image build -t ${imagename} .
+
+#################################################################################
+# Running container
+#################################################################################
+docker container run \
+  --detach \
+  --restart always \
+  --network payroll-network \
+  --name ${containername} \
+  ${imagename}
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs employee-payroll
+  
+  ATENÇÃO!!
+  - Será exibida várias mensagens de erro informando que não foi possível se registrar no serviço
+    'regsitry'
+
+
+Ajustando a referência ao serviço 'registry'
+----------------------------------------------------------------------------------------------------
+- Alterar a propriedade 'eureka.client.service-url.defaultZone'
+
+  De:
+  
+    eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  
+  Para:
+  
+    eureka.client.service-url.defaultZone=http://registry-payroll:8761/eureka
+
+  ATENÇÃO!!!
+  - O nome 'registry-payroll' é o nome do container do serviço 'registry'
+
+
+Removendo o container 'employee-payroll'
+----------------------------------------------------------------------------------------------------
+- Remover o container
+
+  $ docker container stop employee-payroll
+  $ docker container rm employee-payroll
+
+- Remover a imagem
+
+  $ docker image rm employee-payroll:1.0
+
+
+Construindo o módulo 'employee'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'employee', botão direito, escolher Run As -> Maven Build
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs employee-payroll
+
+  ATENÇÃO!!
+  - Será exibida várias mensagens de erro informando que não foi possível conectar ao banco de dados
+
+
+Ajustando a referência ao banco de dados
+----------------------------------------------------------------------------------------------------
+- Alterar a propriedade 'spring.datasource.url'
+
+  De:
+  
+    spring.datasource.url=jdbc:mysql://localhost:3306/payroll
+  
+  Para:
+  
+    spring.datasource.url=jdbc:mysql://db-payroll:3306/payroll
+
+  ATENÇÃO!!!
+  - O nome 'db-payroll' é o nome do container do banco de dados
+
+
+Removendo o container 'employee-payroll'
+----------------------------------------------------------------------------------------------------
+- Remover o container
+
+  $ docker container stop employee-payroll
+  $ docker container rm employee-payroll
+
+- Remover a imagem
+
+  $ docker image rm employee-payroll:1.0
+
+
+Construindo o módulo 'employee'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'employee', botão direito, escolher Run As -> Maven Build
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs employee-payroll
+
+

@@ -1,0 +1,35 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - DELETE
+====================================================================================================
+
+
+Service
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeService.java'
+
+  ...
+  public void delete(Integer id) {
+    repository.deleteById(id);
+  }
+  ...
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeController'
+
+  ...
+  @DeleteMapping("/{id}")
+  ResponseEntity<String> delete(@PathVariable("id") Integer id) {
+    service.delete(id);
+    return ResponseEntity.ok("Employee deleted!");
+  }
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'employee'
+
+- Abrir o Postman, criar uma requisição do tipo DELETE para o endereço http://localhost:8080/employee/{ID}
+
+

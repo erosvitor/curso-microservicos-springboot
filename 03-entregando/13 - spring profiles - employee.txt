@@ -1,0 +1,109 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - SPRING PROFILES - SERVIÇO EMPLOYEE
+====================================================================================================
+
+
+Criando configurações para ambiente de produção
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application-prod.yml'
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://db-payroll:3306/payroll
+    username: root
+    password: root
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry-payroll:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}
+    preferIpAddress: true      
+
+
+Criando configurações para ambiente de desenvolvimento
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application-dev.yml'
+
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+    url: jdbc:mysql://localhost:3306/payroll
+    username: root
+    password: root
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}
+    preferIpAddress: true      
+
+
+Criando configurações gerais
+----------------------------------------------------------------------------------------------------
+- Alterar o arquivo 'application.yml' conforme abaixo
+
+server:
+  port: ${PORT:0}
+
+spring:
+  jpa:
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.MySQL8Dialect
+    hibernate:
+      ddl-auto: none
+    open-in-view: true
+  application:
+    name: service-employee
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+  profiles:
+    active: ${PROFILE_PAYROLL:dev}
+
+
+Ajustando o Dockerfile
+----------------------------------------------------------------------------------------------------
+- Inserir a seguinte linha abaixo da linha 'VOLUME /tmp'
+
+  ENV PROFILE_PAYROLL prod
+
+
+Removendo o container 'employee-payroll'
+----------------------------------------------------------------------------------------------------
+- Remover o container
+
+  $ docker container stop employee-payroll
+  $ docker container rm employee-payroll
+
+- Remover a imagem
+
+  $ docker image rm employee-payroll:1.0
+
+
+Construindo o módulo 'employee'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'employee', botão direito, escolher Run As -> Maven Build
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs employee-payroll
+
+

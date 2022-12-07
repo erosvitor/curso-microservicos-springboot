@@ -1,0 +1,102 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - FGTS SERVICE - CALCULO FGTS
+====================================================================================================
+
+
+Endpoint para obter salario no Employee Service
+----------------------------------------------------------------------------------------------------
+- Adicionar o método abaixo na classe EmployeeService
+
+    ...
+    public Double findSalary(Integer employeeId) {
+        Employee employee = repository.findById(employeeId).orElseThrow(() -> new ResourceNotFoundException("Employee does not exist!"));
+        return employee.getSalary();
+    }
+    ...  
+    
+- Adicionar o endpoint na classe EmployeeController
+
+    ...
+    @GetMapping("/{id}/salary")
+    ResponseEntity<Double> findSalary(@PathVariable("id") Integer id) {
+        return ResponseEntity.ok(service.findSalary(id));
+    }
+    ...
+
+
+Consumindo o endpoint no Fgts Service
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>org.springframework.cloud</groupId>
+      <artifactId>spring-cloud-starter-openfeign</artifactId>
+      <version>3.1.4</version> 
+    </dependency>
+    ...
+
+
+- Adicionar a seguinte annotation na classe 'StartApplication'
+
+  ...
+  @EnableFeignClients
+  ...
+      
+
+- Criar o pacote 'com.ctseducare.fgts.feignclient'
+
+
+- Criar a classe 'EmployeeFeignClient' 
+
+@FeignClient(name="service-employee", url = "localhost:8080")
+public interface EmployeeFeignClient {
+
+    @GetMapping("/employee/{id}/salary")
+    Double findSalary(@PathVariable Integer id);
+
+}
+
+
+- Criar o pacote 'com.ctseducare.fgts.service'
+
+
+- Criar a classse 'FgtsService'
+
+@Service
+public class FgtsService {
+    
+    @Autowired
+    EmployeeFeignClient employee;
+
+    public Double calcularFgts(Integer employeeId) {
+        return employee.findSalary(employeeId) * 0.08;
+    }
+
+}
+
+
+- Alterar o 'FgtsController' conforme abaixo
+
+@RestController
+@RequestMapping(path = "/fgts")
+public class FgtsController {
+  
+  @Autowired
+  private FgtsService service;
+
+  @GetMapping("/employee/{employeeId}")
+  Double calcularFgts(@PathVariable Integer employeeId) {
+    return service.calcularFgts(employeeId);
+  }
+  
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'employee' e 'fgts'
+
+- No Postman criar uma chamada para o endereço http://localhost:8081/fgts/employee/{EMPLOYEE-ID}
+
+

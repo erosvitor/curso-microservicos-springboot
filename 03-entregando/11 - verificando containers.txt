@@ -1,0 +1,18 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - VERIFICANDO CONTAINERS
+====================================================================================================
+
+
+Inspecionando a rede 'payroll-network'
+----------------------------------------------------------------------------------------------------
+- Executar o comando
+
+  $ docker network inspect payroll-network
+
+
+Exibindo estatísticas dos containers
+----------------------------------------------------------------------------------------------------
+- Executar o comando
+
+  $ docker container stats
+

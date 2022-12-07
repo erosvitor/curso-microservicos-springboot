@@ -1,0 +1,78 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - DOCKERIZANDO SERVIÇO GATEWAY
+====================================================================================================
+
+
+Criando o Dockerfile
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'Dockerfile' dentro da pasta 'gateway'
+
+FROM openjdk:17
+VOLUME /tmp
+EXPOSE 8888
+COPY ./target/gateway-0.0.1-SNAPSHOT.jar gateway.jar
+ENTRYPOINT ["java", "-jar", "/gateway.jar"]
+
+
+Criando o shell script
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'create-container.sh' dentro da pasta 'gateway'
+
+#!/bin/bash
+
+imagename="gateway-payroll:1.0"
+containername="gateway-payroll"
+volumedir="gateway-payroll"
+
+#################################################################################
+# Building image
+#################################################################################
+docker image build -t ${imagename} .
+
+#################################################################################
+# Running container
+#################################################################################
+docker container run \
+  --detach \
+  --restart always \
+  --network payroll-network \
+  --name ${containername} \
+  ${imagename}
+
+
+Ajustando a referência ao serviço 'registry'
+----------------------------------------------------------------------------------------------------
+- Alterar a propriedade 'eureka.client.service-url.defaultZone'
+
+  De:
+  
+    eureka.client.service-url.defaultZone=http://localhost:8761/eureka
+  
+  Para:
+  
+    eureka.client.service-url.defaultZone=http://registry-payroll:8761/eureka
+
+  ATENÇÃO!!!
+  - O nome 'registry-payroll' é o nome do container do serviço 'registry'
+
+
+Construindo o módulo 'gateway'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'gateway', botão direito, escolher Run As -> Maven Build
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs gateway-payroll
+  
+

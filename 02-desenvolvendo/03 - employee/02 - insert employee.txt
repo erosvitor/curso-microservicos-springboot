@@ -1,0 +1,91 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - INSERT
+====================================================================================================
+
+
+Service
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeService'
+
+  ...
+  public EmployeeDTO insert(EmployeeDTO dto) {
+
+    Employee employee = new Employee();
+    employee.setName(dto.getName());
+    employee.setSalary(dto.getSalary());
+    employee.setBirthday(dto.getBirthday());
+
+    dto.getDependents().stream().forEach(
+      (d) -> {
+        employee.getDependents().add(
+          new EmployeeDependent(
+            null,
+            d.getName(),
+            d.getBirthday(),
+            employee
+        ));
+    });
+ 
+    repository.save(employee);
+    
+    employee.getDependents().stream().forEach(
+      (d) -> {
+        dto.getDependents().stream().forEach(
+          (d2) -> {
+            if (d2.getName().equals(d.getName())) {
+              d2.setId(d.getId());
+            }
+        });
+    });
+
+    dto.setId(employee.getId());
+    
+    return dto;
+  }
+  ...
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Alterar a classe 'EmployeeController' conforme abaixo
+
+@RestController
+@RequestMapping(path = "/employee")
+public class EmployeeController {
+
+  @Autowired
+  EmployeeService service;
+  
+  @PostMapping
+  ResponseEntity<EmployeeDTO> insert(@RequestBody EmployeeDTO employee) {
+    EmployeeDTO e = service.insert(employee);
+    return ResponseEntity.ok(e);
+  }
+
+}
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'employee'
+
+- Abrir o Postman, criar uma requisição do tipo POST para o endereço http://localhost:8080/employee
+  enviando o JSON abaixo
+
+  {
+    "name": "Fulano da Silva",
+    "salary": 3500.00,
+    "birthday": "1975-01-10",
+    "dependents": [
+        {
+          "name": "Siclano Gomes",
+          "birthday": "1981-12-03"
+        },
+        {
+          "name": "Beltrano Pereira",
+          "birthday": "2001-05-25"
+        }
+    ]
+  }
+
+

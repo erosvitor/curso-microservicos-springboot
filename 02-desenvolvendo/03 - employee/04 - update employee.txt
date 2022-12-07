@@ -1,0 +1,85 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - UPDATE
+====================================================================================================
+
+
+Service
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeService'
+
+    ...
+    public EmployeeDTO update(EmployeeDTO dto) {
+        Employee employee = new Employee();
+        employee.setId(dto.getId());
+        employee.setName(dto.getName());
+        employee.setSalary(dto.getSalary());
+        employee.setBirthday(dto.getBirthday());
+
+        dto.getDependents().stream().forEach(
+          (d) -> {
+            employee.getDependents().add(
+              new EmployeeDependent(
+                d.getId(),
+                d.getName(),
+                d.getBirthday(),
+                employee
+            ));
+        });
+     
+        Employee employeeUpdated = repository.save(employee);
+        
+        employeeUpdated.getDependents().stream().forEach(
+          (d) -> {
+            dto.getDependents().stream().forEach(
+              (d2) -> {
+                if (d2.getName().equals(d.getName())) {
+                  d2.setId(d.getId());
+                }
+            });
+        });
+       
+        return dto;
+    }
+    ...
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas abaixo na classe 'EmployeeController'
+
+  ...
+  @PutMapping
+  ResponseEntity<EmployeeDTO> update(@RequestBody EmployeeDTO employee) {
+    EmployeeDTO e = service.update(employee);
+    return ResponseEntity.ok(e);
+  }
+  ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'employee'
+
+- Abrir o Postman, criar uma requisição do tipo PUT para o endereço http://localhost:8080/employee
+  enviando o JSON abaixo
+
+  {
+    "id": ???,
+    "name": "Fulano da Silva Pedroso",
+    "salary": 5500.00,
+    "birthday": "1975-01-10",
+    "dependents": [
+        {
+          "id": ???,
+          "name": "Siclano Gomes",
+          "birthday": "1981-12-03"
+        },
+        {
+          "id": ???,
+          "name": "Beltrano Pereira",
+          "birthday": "2001-05-25"
+        }
+    ]
+  }
+
+

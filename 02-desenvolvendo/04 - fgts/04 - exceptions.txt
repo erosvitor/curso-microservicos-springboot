@@ -1,0 +1,154 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - FGTS SERVICE - EXCEPTIONS
+====================================================================================================
+
+
+Exceção
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.fgts.exception'
+
+- Criar a classe 'ResourceNotFoundException'
+
+@ResponseStatus(HttpStatus.NOT_FOUND)
+public class ResourceNotFoundException extends RuntimeException{
+
+  private static final long serialVersionUID = 1L;
+
+  public ResourceNotFoundException(String exception) {
+    super(exception);
+  }
+
+}
+
+
+Resposta
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.fgts.exception.response'
+
+- Criar a classe 'ExceptionResponse'
+
+public class ExceptionResponse implements Serializable {
+
+  private static final long serialVersionUID = 1L;
+
+  private int error;
+  private String reason;
+  
+  public ExceptionResponse() {
+  
+  }
+
+  public ExceptionResponse(int error, String reason) {
+    this.error = error;
+    this.reason = reason;
+  }
+
+  public int getError() {
+    return error;
+  }
+
+  public String getReason() {
+    return reason;
+  }
+
+}
+
+
+Manipulador
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.fgts.exception.handle'
+
+- Criar a classe 'ResponseEntityExceptionHandlerCustom'
+
+@ControllerAdvice
+public class ResponseEntityExceptionHandlerCustom extends ResponseEntityExceptionHandler {
+
+  @ExceptionHandler(ResourceNotFoundException.class)
+  public final ResponseEntity<ExceptionResponse> handleResourceNotFoundExceptions(Exception ex, WebRequest request) {
+    ExceptionResponse exceptionResponse = new ExceptionResponse(HttpStatus.NOT_FOUND.value(), ex.getMessage());
+    return new ResponseEntity<>(exceptionResponse, HttpStatus.NOT_FOUND);
+  }
+  
+}
+
+
+Decoder para Feign exceptions
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.fgts.exception.decoder'
+
+- Criar a classe 'FeignExceptionDecoder'
+
+import java.io.IOException;
+import java.io.InputStream;
+
+import com.ctseducare.fgts.exception.ResourceNotFoundException;
+import com.ctseducare.fgts.exception.response.ExceptionResponse;
+import com.fasterxml.jackson.databind.ObjectMapper;
+
+import feign.Response;
+import feign.codec.ErrorDecoder;
+
+public class FeignExceptionDecoder implements ErrorDecoder {
+    private ErrorDecoder errorDecoder = new Default();
+
+    @Override
+    public Exception decode(String methodKey, Response response) {
+        ExceptionResponse message = null;
+        try (InputStream bodyIs = response.body().asInputStream()) {
+            ObjectMapper mapper = new ObjectMapper();
+            message = mapper.readValue(bodyIs, ExceptionResponse.class);
+        } catch (IOException e) {
+            return new Exception(e.getMessage());
+        }
+        switch (response.status()) {
+            case 404:
+                return new ResourceNotFoundException(message.getReason() != null ? message.getReason() : "Not found");
+            default:
+                return errorDecoder.decode(methodKey, response);
+        }
+    }
+}
+
+
+Ajustando o StartApplication
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas no 'StartApplication'
+
+    ...
+    @Bean
+    public ErrorDecoder errorDecoder() {
+        return new FeignExceptionDecoder();
+    }
+    ...
+    
+    
+Catch exception when refused connection
+----------------------------------------------------------------------------------------------------
+- Add following lines in 'ResponseEntityExceptionHandlerCustom' class
+
+    ...
+    @ExceptionHandler(ConnectException.class)
+    public final ResponseEntity<ExceptionResponse> handleConnectExceptions(Exception ex, WebRequest request) {
+        ExceptionResponse exceptionResponse = new ExceptionResponse(HttpStatus.BAD_GATEWAY.value(), ex.getMessage());
+        return new ResponseEntity<>(exceptionResponse, HttpStatus.BAD_GATEWAY);
+    }
+    ...
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'employee' e 'fgts'
+
+- Recuperar o salário de um funcionário inexistente
+
+  Obs: Será exibida a mensagem 
+  
+    'Employee does not exist!'
+  
+- Desligar o serviço 'employee' e recuperar o salário de um funcionário existente
+
+  Obs: Será exibida a mensagem:
+    
+    'Conexão recusada executing GET http://localhost:8080/employee/8/salary'
+
+

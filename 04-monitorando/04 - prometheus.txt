@@ -1,0 +1,141 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - PROMETHEUS - ARMAZENANDO MÉTRICAS
+====================================================================================================
+
+
+Instalando Micrometer Prometheus
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência
+
+    ...
+    <dependency>
+      <groupId>io.micrometer</groupId>
+      <artifactId>micrometer-registry-prometheus</artifactId>
+    </dependency>
+    ...
+
+
+Removendo o coletor 'metrics'
+----------------------------------------------------------------------------------------------------
+Obs: Quando utilizamos o Prometheus, não precisamos manter ativo o coletor 'metrics'
+
+- Remover 'metrics' 
+
+  management.endpoints.web.exposure.include=info
+
+- Remover a configuração
+
+  management.endpoint.metrics.enabled=true
+
+
+Ativando o coletor 'prometheus'
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes configurações
+
+  management.endpoints.web.exposure.include=info, prometheus
+  management.endpoint.prometheus.enabled=true
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar o serviço 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+- Substituir 'info' por 'prometheus' conforme abaixo
+
+  http://<ENDERECO-IP:PORTA>/actuator/prometheus
+
+
+Criando o dockerfile para o Prometheus
+----------------------------------------------------------------------------------------------------
+- Criar a pasta 'prometheus' dentro do projeto 'payroll-suite'
+
+- Criar o arquivo 'prometheus.yml' dentro da pasta 'prometheus'
+
+scrape_configs:
+  - job_name: "job-service-employee"
+    metrics_path: "/actuator/prometheus"
+    scrape_interval: 5s
+    static_configs:
+      - targets: ["employee-payroll"]
+        labels:
+          application: "service-employee"
+          
+
+- Criar o arquivo 'Dockerfile' dentro da pasta 'prometheus'
+
+FROM prom/prometheus:latest
+COPY prometheus.yml /etc/prometheus/
+
+
+- Criar o arquivo 'create-container.sh' dentro da pasta 'prometheus'
+
+#!/bin/bash
+
+imagename="prometheus-payroll:1.0"
+containername="prometheus-payroll"
+
+#################################################################################
+# Building image
+#################################################################################
+docker image build -t ${imagename} .
+
+#################################################################################
+# Running container
+#################################################################################
+docker container run \
+  --detach \
+  --restart always \
+  --network payroll-network \
+  --publish 9090:9090
+  --name ${containername} \
+  ${imagename}
+
+
+- Criar o container
+
+  $ sh create-container.sh
+
+          
+
+- Criar o arquivo 'docker-compose.yml' dentro da pasta 'prometheus'
+
+version: '3.3'
+
+networks:
+  ps-network:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+
+services:
+  prometheus:
+    image: prom/prometheus:latest
+    volumes:
+      - ./prometheus.yml:/etc/prometheus/prometheus.yml
+      - prometheus_data:/prometheus
+    networks:
+      - ps-network
+    ports:
+      - 9090:9090    
+
+- Criar o container
+
+  # docker-compose up
+
+- Acessar o container
+
+  http://localhost:9090
+
+
+Configurando o Prometheus
+----------------------------------------------------------------------------------------------------
+- Inserir as seguintes linhas no arquivo 'prometheus.yml'
+
+
+
+- Reiniciar o container do Prometheus
+
+          

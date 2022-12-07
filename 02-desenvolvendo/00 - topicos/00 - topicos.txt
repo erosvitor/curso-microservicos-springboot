@@ -1,0 +1,150 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - TÓPICOS
+====================================================================================================
+
+
+Tópicos envolvidos nessa etapa
+----------------------------------------------------------------------------------------------------
+- @RestController vs @Controller
+- Spring Data JPA
+- Repository e DAO
+- Padrões de projeto DTO e VO
+- OpenFeign
+- Service registry
+- API Gateway
+
+
+@RestController vs @Controller
+----------------------------------------------------------------------------------------------------
+- @RestController
+  - Combinação de @Controller e @ResponseBody
+  - Adicionado no Spring 4.0
+  - Define uma classe como web service
+  - Retorna um objeto no formado JSON, XML ou YAML
+
+- @Controller
+  - Adicionado no Spring 2.5
+  - Define uma classe como um controller (o 'C' no padrão MVC)
+  - Disponibiliza um objeto (o 'M' do padrão MVC) dentro da página do usuário (o 'V' do padrão MVC)
+
+
+Spring Data JPA
+----------------------------------------------------------------------------------------------------
+- Parte do ecossistema Spring Data
+- Implementa a camada de acesso a dados (DAO)
+
+
+Repository e DAO
+----------------------------------------------------------------------------------------------------
+- DAO
+  - Data Access Object
+  - Responsável pela captura e persistência dos dados
+  - Diretamente ligado ao banco de dados
+
+- Repository
+  - Contem objetos do domínio da aplicação
+  - No Spring Data JPA, faz o papel do DAO
+
+- Exemplo DAO
+
+public class User {
+  private Long id;
+  private String name;
+  private String email;
+
+  // getters and setters
+}
+
+public interface UserDao {
+  User insert(User user);
+  List<User> listAll();
+  User update(User user);
+  User delete(Long id);
+}
+
+public class UserDaoImpl implements UserDao {
+  public User insert(User user) {
+    //TODO
+  }
+
+  public List<User> listAll() {
+    //TODO
+  }
+
+  ...
+}
+
+
+- Exemplo Repository
+
+public class Post {
+  private String content;
+  private Date dateCreated;
+
+  // getters and setters
+}
+
+public interface PostDao {
+  List<Post> listAll();
+}
+
+public class PostDaoImpl implements PostDao {
+  public List<Post> listAll(Long userId) {
+    // TODO
+  }  
+}
+
+// Domínio
+public class UserPost extends User {
+  private List<Post> posts;
+
+  // getters and setters
+}
+
+public class UserRepositoryImpl {
+  private UserDaoImpl userDao;
+  private PostDaoImpl postDao;
+    
+  public User get(Long id) {
+    UserPost user = (UserPost) userDao.findById(id);
+        
+    List<Post> posts= postDao.listAll(user.getId);
+    user.setPosts(posts);
+   
+    return user;
+  }
+}
+    
+
+Padrões de projeto DTO e VO
+----------------------------------------------------------------------------------------------------
+- DTO
+  - Data Transfer Object
+  - Transferência de dados entre camadas
+  - Não possui lógica negocial
+  - Camada do usuário para Camada da Aplicação
+
+- VO
+  - Value Object
+  - Pertence a camada de domínio
+  - Não precisa de um identificador
+  - Não possui identidade (atributo id)
+  - Exemplos de VO
+    - Endereço (Rua, Numero, Cep)
+    - Nome (Primeiro nome, Sobrenome)
+
+
+OpenFeign
+----------------------------------------------------------------------------------------------------
+???
+
+
+Service Registry
+----------------------------------------------------------------------------------------------------
+???
+
+
+API Gateway
+----------------------------------------------------------------------------------------------------
+???
+

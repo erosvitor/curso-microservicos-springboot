@@ -1,0 +1,64 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - ACTUATOR
+====================================================================================================
+
+
+Employee Service
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte dependência 
+
+    ...
+    <!-- Actuator -->
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-actuator</artifactId>
+    </dependency>
+    ...
+
+
+Ativando o endpoint 'info'
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte configuração
+
+  management.endpoints.web.exposure.include=info
+    
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar os serviços 'registry' e 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+
+Ativando informações sobre o Java
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte configuração
+
+  management.info.java.enabled=true
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar o serviço 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+
+Ativando informações extras
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes configurações
+
+  management.info.env.enabled=true
+  info.app.name=service-employee
+  info.app.description=Serviço que provê recursos para cadastro de empregados
+  info.app.version=0.0.1-SNAPSHOT
+  info.app.author=Eros Vitor Bornatowski
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar o serviço 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+

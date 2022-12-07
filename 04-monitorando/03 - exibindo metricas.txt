@@ -1,0 +1,53 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EXIBINDO MÉTRICAS
+====================================================================================================
+
+
+Spring Boot Actuator
+----------------------------------------------------------------------------------------------------
+- Adicionar a seguinte configuração
+
+  management.endpoints.web.exposure.include=info, metrics
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar o serviço 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+- Substituir 'info' por 'metrics' conforme abaixo
+
+  http://<ENDERECO-IP:PORTA>/actuator/metrics
+
+  Obs: Será exibida uma lista contendo várias métricas
+  
+
+Visualizando uma determinada métrica
+----------------------------------------------------------------------------------------------------
+- Acrescentar a métrica desejada após a URL http://<ENDERECO-IP:PORTA>/actuator/metrics
+
+  Por exemplo, para analizarmos a métrica sobre espaço livre no disco
+  
+    http://<ENDERECO-IP:PORTA>/actuator/metrics/disk.free
+    
+
+Exibindo apenas coletores necessários
+----------------------------------------------------------------------------------------------------
+- Desabilitar todos os endpoints por padrão
+
+  management.endpoints.enabled-by-default=false
+
+- Ativar apenas os endpoints necessários
+
+  management.endpoint.info.enabled: true
+  management.endpoint.metrics.enabled: true
+  
+ 
+Verificando
+----------------------------------------------------------------------------------------------------
+- Reiniciar o serviço 'employee'
+
+- Acessar o dashboard do 'registry' e clicar no item SERVICE_EMPLOYEE
+
+

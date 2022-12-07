@@ -1,0 +1,16 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - PROBLEMAS
+====================================================================================================
+
+
+Problemas encontrados até o momento
+----------------------------------------------------------------------------------------------------
+- No dashboard do serviço registry não é possível obter informações sobre os serviços
+- Não conseguimos quantificar acessos aos serviços
+
+
+Solução
+----------------------------------------------------------------------------------------------------
+- Utilizar Spring Actuator
+- Armazenar métricas no Prometheus
+- Visualizar métricas pelo Grafana

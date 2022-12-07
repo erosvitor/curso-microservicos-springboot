@@ -1,0 +1,83 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - IMPOSTOS SERVICE
+====================================================================================================
+
+
+Criando o módulo Impostos
+----------------------------------------------------------------------------------------------------
+- Selecionar o projeto 'payroll-suite' e clicar em File > New > Other > Maven Module
+
+- Marcar a opção 'Create a simple project'
+
+- Digitar 'impostos' no campo 'Module name' e clicar no botão 'Finish'
+
+- Adicionar a dependência 'starter web' no arquivo 'pom.xml'
+
+  ...
+  <dependencies>
+    <dependency>
+      <groupId>org.springframework.boot</groupId>
+      <artifactId>spring-boot-starter-web</artifactId>
+    </dependency>
+  </dependencies>
+  ...
+
+
+StartApplication
+----------------------------------------------------------------------------------------------------  
+- Criar o pacote 'com.ctseducare.impostos'
+
+- Criar a classe 'StartApplication'
+
+@SpringBootApplication
+public class StartApplication {
+
+  public static void main(String[] args) {
+    SpringApplication.run(StartApplication.class, args);
+  }
+  
+}
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Criar o pacote 'com.ctseducare.impostos.controller'
+
+- Criar a classe 'ImpostosController'
+
+@RestController
+@RequestMapping
+public class ImpostosController {
+
+  @GetMapping
+  String status() {
+    return "I am up!";
+  }
+  
+}
+
+
+Porta serviço
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application.properties' (ou application.yml) dentro da pasta 'src/main/resources'
+
+- Definir a porta do serviço usando o arquivo 'application.properties'
+
+  # Server settings
+  server.port=8081
+
+  ou
+  
+  server:
+    port:8081
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'impostos'
+
+- Usando um navegador, acessar o endereço http://localhost:8083
+
+  Obs: Será exibida a mensagem 'I am up!'
+  
+

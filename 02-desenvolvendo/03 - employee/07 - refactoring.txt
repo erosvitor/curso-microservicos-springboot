@@ -1,0 +1,288 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - REFACTORING
+====================================================================================================
+
+
+Padronizando retorno dos endpoints
+----------------------------------------------------------------------------------------------------
+- Alterar o método 'delete' da classe 'EmployeeService' para que seja retornado o 'employee' excluído
+
+    ...
+    public EmployeeDTO delete(Integer id) {
+        Employee employee = repository.findById(id).get();
+        repository.deleteById(id);
+        
+        EmployeeDTO dto = new EmployeeDTO();
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setSalary(employee.getSalary());
+        dto.setBirthday(employee.getBirthday());
+        
+        for (EmployeeDependent ed : employee.getDependents()) {
+            EmployeeDependentDTO edDTO = new EmployeeDependentDTO();
+            edDTO.setId(ed.getId());
+            edDTO.setName(ed.getName());
+            edDTO.setBirthday(ed.getBirthday());
+            dto.getDependents().add(edDTO);
+        }
+        return dto; 
+    }
+    ...
+
+- Ajustar o endpoint 'delete' conforme abaixo
+
+    ...
+    @DeleteMapping("/{id}")
+    ResponseEntity<EmployeeDTO> delete(@PathVariable("id") Integer id) {
+      EmployeeDTO e = service.delete(id);
+      return ResponseEntity.ok(e);
+    }
+    ...
+
+
+Aplicando YAGNI
+----------------------------------------------------------------------------------------------------
+- Aplicar o princípio YAGNI na classe 'EmployeeController' para remover o uso desnecessário das
+  variáveis
+
+  ...
+  @PostMapping
+  ResponseEntity<EmployeeDTO> insert(@RequestBody EmployeeDTO employee) {
+    return ResponseEntity.ok(service.insert(employee));
+  }
+  
+  @GetMapping
+  ResponseEntity<List<EmployeeDTO>> findAll() {
+    return ResponseEntity.ok(service.findAll());
+  }
+
+  @PutMapping
+  ResponseEntity<EmployeeDTO> update(@RequestBody EmployeeDTO employee) {
+    return ResponseEntity.ok(service.update(employee));
+  }
+  
+  @DeleteMapping("/{id}")
+  ResponseEntity<EmployeeDTO> delete(@PathVariable("id") Integer id) {
+    return ResponseEntity.ok(service.delete(id));
+  }
+  ...
+
+
+Aplicando DRY nos métodos insert e update
+----------------------------------------------------------------------------------------------------
+- Aplicar o princípio DRY para remover a duplicidade do código para transformar DTO em model dos
+  métodos 'insert' e 'update'
+
+- Criar o método 'dtoToModel' conforme abaixo
+
+    ...
+    private Employee dtoToModel(EmployeeDTO dto) {
+        Employee model = new Employee();
+        model.setId(dto.getId());
+        model.setName(dto.getName());
+        model.setSalary(dto.getSalary());
+        model.setBirthday(dto.getBirthday());
+
+        dto.getDependents().stream().forEach(
+          (d) -> {
+              model.getDependents().add(
+              new EmployeeDependent(
+                d.getId(),
+                d.getName(),
+                d.getBirthday(),
+                model
+            ));
+        });
+        
+        return model;
+    }
+    ...
+
+- Alterar o método 'insert' conforme abaixo
+
+    ...
+    public EmployeeDTO insert(EmployeeDTO dto) {
+        Employee employee = dtoToModel(dto);
+     
+        repository.save(employee);
+        
+        employee.getDependents().stream().forEach(
+          (d) -> {
+            dto.getDependents().stream().forEach(
+              (d2) -> {
+                if (d2.getName().equals(d.getName())) {
+                  d2.setId(d.getId());
+                }
+            });
+        });
+
+        dto.setId(employee.getId());
+        
+        return dto;
+    }
+    ...
+
+- Alterar o método 'update' conforme abaixo
+
+    ...
+    public EmployeeDTO update(EmployeeDTO dto) {
+        Employee employee = dtoToModel(dto);
+        
+        Employee employeeUpdated = repository.save(employee);
+        
+        employeeUpdated.getDependents().stream().forEach(
+          (d) -> {
+            dto.getDependents().stream().forEach(
+              (d2) -> {
+                if (d2.getName().equals(d.getName())) {
+                  d2.setId(d.getId());
+                }
+            });
+        });
+       
+        return dto;
+    }
+    ...
+
+
+Aplicando DRY nos métodos findAll e delete
+----------------------------------------------------------------------------------------------------
+- Aplicar o princípio DRY para remover a duplicidade do código para transformar model em DTO dos
+  métodos 'findAll' e 'delete'
+
+- Criar o método 'modelToDTO' conforme abaixo
+
+    ...
+    private EmployeeDTO modelToDTO(Employee employee) {
+        EmployeeDTO dto = new EmployeeDTO();
+        dto.setId(employee.getId());
+        dto.setName(employee.getName());
+        dto.setSalary(employee.getSalary());
+        dto.setBirthday(employee.getBirthday());
+        
+        for (EmployeeDependent ed : employee.getDependents()) {
+          EmployeeDependentDTO edDTO = new EmployeeDependentDTO();
+          edDTO.setId(ed.getId());
+          edDTO.setName(ed.getName());
+          edDTO.setBirthday(ed.getBirthday());
+          dto.getDependents().add(edDTO);
+        }
+        
+        return dto;
+    }
+    ...
+
+- Alterar o método 'findAll' conforme abaixo
+
+    ... 
+    public List<EmployeeDTO> findAll() {
+        List<Employee> employees = repository.findAll();
+        
+        List<EmployeeDTO> dtos = new ArrayList<>();
+        for (Employee e : employees) {
+          dtos.add(modelToDTO(e));
+        }
+        
+        return dtos;
+    }
+    ...
+
+- Alterar o método 'delete' conforme abaixo
+
+    ... 
+    public EmployeeDTO delete(Integer id) {
+        Employee employee = repository.findById(id).get();
+        repository.deleteById(id);
+        return modelToDTO(employee);
+    }
+    ...
+
+
+Aplicando DRY nos métodos insert e update
+----------------------------------------------------------------------------------------------------
+- Aplicar o princípio DRY para remover a duplicidade do código para atribuir os IDs nos dependentes
+
+- Criar o método 'settingIDs' conforme abaixo
+
+    ...
+    private void settingIDs(Employee employee, EmployeeDTO dto) {
+        employee.getDependents().stream().forEach(
+            (d) -> {
+                dto.getDependents().stream().forEach(
+                    (d2) -> {
+                      if (d2.getName().equals(d.getName())) {
+                        d2.setId(d.getId());
+                      }
+                  });
+            }
+        );
+    }
+    ...
+
+- Alterar o método 'insert' conforme abaixo
+
+    ...
+    public EmployeeDTO insert(EmployeeDTO dto) {
+        Employee employee = dtoToModel(dto);
+        repository.save(employee);
+        settingIDs(employee, dto);
+        dto.setId(employee.getId());
+        return dto;
+    }
+    ...
+
+- Alterar o método 'update' conforme abaixo
+
+    ...
+    public EmployeeDTO update(EmployeeDTO dto) {
+        Employee employee = dtoToModel(dto);
+        Employee employeeUpdated = repository.save(employee);
+        settingIDs(employeeUpdated, dto);
+        return dto;
+    }
+    ...
+
+
+Refatorando o método 'findAll'
+----------------------------------------------------------------------------------------------------
+- O código abaixo é uma segunda opção para o método 'findAll'
+
+    ...
+    public List<EmployeeDTO> findAll() {
+        return repository.findAll().stream().map( e -> { return modelToDTO(e); }).collect(Collectors.toList());
+    }
+    ...
+
+
+Aplicando DRY nos métodos insert e update
+----------------------------------------------------------------------------------------------------
+- Aplicar o princípio DRY para remover a duplicidade do código dos métodos 'insert' e 'update'
+
+- Criar o método 'insertOrUpdate'
+
+    ...
+    private EmployeeDTO insertOrUpdate(EmployeeDTO dto) {
+        Employee result = repository.save(dtoToModel(dto));
+        settingIDs(result, dto);
+        dto.setId(result.getId());
+        return dto;
+    }
+    ...
+
+- Alterar o método 'insert' conforme abaixo
+
+    ... 
+    public EmployeeDTO insert(EmployeeDTO dto) {
+        return insertOrUpdate(dto);
+    }
+    ...
+
+- Alterar o método 'update' conforme abaixo
+
+    ... 
+    public EmployeeDTO update(EmployeeDTO dto) {
+        return insertOrUpdate(dto);
+    }
+    ...
+
+

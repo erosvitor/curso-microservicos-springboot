@@ -1,0 +1,245 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - AUTOMATIZANDO ENTREGA
+====================================================================================================
+
+
+Script para rede
+----------------------------------------------------------------------------------------------------
+- Criar a pasta 'network' dentro da pasta 'payroll-suite'
+
+- Criar o arquivo 'create-network.sh'
+
+#!/bin/bash
+
+docker network create --driver bridge payroll-network
+
+
+Script para deploy
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'deploy.sh' dentro da pasta 'payroll-suite'
+
+#!/bin/bash
+
+echo "--------------------------------------------------------------------------------"
+echo "Iniciando deploy..."
+echo "--------------------------------------------------------------------------------"
+echo ""
+
+echo "Criando a rede..."
+echo "--------------------------------------------------------------------------------"
+cd network
+sh create-network.sh
+cd ..
+echo ""
+
+echo "Criando o banco de dados..."
+echo "--------------------------------------------------------------------------------"
+cd database
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço REGISTRY..."
+echo "--------------------------------------------------------------------------------"
+cd registry
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço GATEWAY..."
+echo "--------------------------------------------------------------------------------"
+cd gateway
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço EMPLOYEE..."
+echo "--------------------------------------------------------------------------------"
+cd employee
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço FGTS..."
+echo "--------------------------------------------------------------------------------"
+cd fgts
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço INSS..."
+echo "--------------------------------------------------------------------------------"
+cd inss
+sh create-container.sh
+cd ..
+echo ""
+
+echo "Criando o container para o serviço IMPOSTOS..."
+echo "--------------------------------------------------------------------------------"
+cd impostos
+sh create-container.sh
+cd ..
+echo ""
+
+echo "--------------------------------------------------------------------------------"
+echo "Deploy finalizado!"
+echo "--------------------------------------------------------------------------------"
+
+
+Script para remover rede
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-network.sh' dentro da pasta 'network'
+
+#!/bin/bash
+
+docker network rm payroll-network
+
+
+Script para remover container do banco de dados
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'database'
+
+#!/bin/bash
+
+docker container stop db-payroll
+docker container rm db-payroll
+docker image rm db-payroll:1.0
+
+
+Script para remover container do registry
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'registry'
+
+#!/bin/bash
+
+docker container stop registry-payroll
+docker container rm registry-payroll
+docker image rm registry-payroll:1.0
+
+
+Script para remover container do gateway
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'gateway'
+
+#!/bin/bash
+
+docker container stop gateway-payroll
+docker container rm gateway-payroll
+docker image rm gateway-payroll:1.0
+
+
+Script para remover container do employee
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'employee'
+
+#!/bin/bash
+
+docker container stop employee-payroll
+docker container rm employee-payroll
+docker image rm employee-payroll:1.0
+
+
+Script para remover container do fgts
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'fgts'
+
+#!/bin/bash
+
+docker container stop fgts-payroll
+docker container rm fgts-payroll
+docker image rm fgts-payroll:1.0
+
+
+Script para remover container do inss
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'inss'
+
+#!/bin/bash
+
+docker container stop inss-payroll
+docker container rm inss-payroll
+docker image rm inss-payroll:1.0
+
+
+Script para remover container do impostos
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'remove-container' dentro da pasta 'impostos'
+
+#!/bin/bash
+
+docker container stop impostos-payroll
+docker container rm impostos-payroll
+docker image rm impostos-payroll:1.0
+
+
+Script para undeploy
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'undeploy.sh' dentro da pasta 'payroll-suite'
+
+#!/bin/bash
+
+echo "--------------------------------------------------------------------------------"
+echo "Iniciando undeploy..."
+echo "--------------------------------------------------------------------------------"
+echo ""
+
+echo "Removendo container do serviço impostos..."
+echo "--------------------------------------------------------------------------------"
+cd impostos
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do serviço inss..."
+echo "--------------------------------------------------------------------------------"
+cd inss
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do serviço fgts..."
+echo "--------------------------------------------------------------------------------"
+cd fgts
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do serviço employee..."
+echo "--------------------------------------------------------------------------------"
+cd employee
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do serviço gateway..."
+echo "--------------------------------------------------------------------------------"
+cd gateway
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do serviço registry..."
+echo "--------------------------------------------------------------------------------"
+cd registry
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo container do banco de dados..."
+echo "--------------------------------------------------------------------------------"
+cd database
+sh remove-container.sh
+cd ..
+echo ""
+
+echo "Removendo a rede..."
+echo "--------------------------------------------------------------------------------"
+cd network
+sh remove-network.sh
+cd ..
+echo ""
+
+echo "--------------------------------------------------------------------------------"
+echo "Undeploy finalizado!"
+echo "--------------------------------------------------------------------------------"
+

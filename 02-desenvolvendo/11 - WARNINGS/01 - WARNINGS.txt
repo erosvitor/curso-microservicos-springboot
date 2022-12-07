@@ -1,0 +1,35 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - WARNINGS
+====================================================================================================
+
+Cache LoadBalance
+----------------------------------------------------------------------------------------------------
+- Todos os serviços estão apresentando a seguinte advertência
+
+  "Spring Cloud LoadBalancer is currently working with the default cache. While this cache 
+  implementation is useful for development and tests, it's recommended to use Caffeine cache in
+  production.You can switch to using Caffeine cache, by adding it and 
+  org.springframework.cache.caffeine.CaffeineCacheManager to the classpath."
+  
+- Solução
+
+  Desativar o cache do LoadBalance
+  
+    spring.cloud.loadbalancer.cache.enabled=false
+    
+  Obs: Desabilitar em todos os serviços  
+
+
+Open-in-view
+----------------------------------------------------------------------------------------------------
+- No serviço 'employee' é apresentado o seguinte warning
+
+  spring.jpa.open-in-view is enabled by default. Therefore, database queries may be performed 
+  during view rendering. Explicitly configure spring.jpa.open-in-view to disable this warning
+  
+- Solução
+
+  Deixar explicita a configuração
+  
+    spring.jpa.open-in-view=true
+

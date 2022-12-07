@@ -1,0 +1,88 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - SPRING PROFILES - SERVIÇO INSS
+====================================================================================================
+
+
+Criando configurações para ambiente de produção
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application-prod.yml'
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://registry-payroll:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}
+    preferIpAddress: true      
+
+
+Criando configurações para ambiente de desenvolvimento
+----------------------------------------------------------------------------------------------------
+- Criar o arquivo 'application-dev.yml'
+
+eureka:
+  client:
+    service-url:
+      defaultZone: http://localhost:8761/eureka
+  instance:
+    instance-id: ${spring.application.name}
+    preferIpAddress: true      
+
+
+Criando configurações gerais
+----------------------------------------------------------------------------------------------------
+- Alterar o arquivo 'application.yml' conforme abaixo
+
+server:
+  port: ${PORT:0}
+
+spring:
+  application:
+    name: service-inss
+  cloud:
+    loadbalancer:
+      cache:
+        enabled: false
+  profiles:
+    active: ${PROFILE_PAYROLL:dev}
+    
+
+Ajustando o Dockerfile
+----------------------------------------------------------------------------------------------------
+- Inserir a seguinte linha abaixo da linha 'VOLUME /tmp'
+
+  ENV PROFILE_PAYROLL prod
+
+
+Removendo o container 'inss-payroll'
+----------------------------------------------------------------------------------------------------
+- Remover o container
+
+  $ docker container stop inss-payroll
+  $ docker container rm inss-payroll
+
+- Remover a imagem
+
+  $ docker image rm inss-payroll:1.0
+
+
+Construindo o módulo 'inss'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'inss', botão direito, escolher Run As -> Maven Build
+
+
+Criando o container
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs inss-payroll
+
+

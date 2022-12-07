@@ -1,0 +1,57 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - EMPLOYEE SERVICE - INSERT
+====================================================================================================
+
+
+Service
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeService'
+
+  ...
+  public List<EmployeeDTO> findAll() {
+    List<Employee> employees = repository.findAll();
+    
+    List<EmployeeDTO> dtos = new ArrayList<>();
+    for (Employee e : employees) {
+      EmployeeDTO dto = new EmployeeDTO();
+      dto.setId(e.getId());
+      dto.setName(e.getName());
+      dto.setSalary(e.getSalary());
+      dto.setBirthday(e.getBirthday());
+      
+      for (EmployeeDependent ed : e.getDependents()) {
+        EmployeeDependentDTO edDTO = new EmployeeDependentDTO();
+        edDTO.setId(ed.getId());
+        edDTO.setName(ed.getName());
+        edDTO.setBirthday(ed.getBirthday());
+        dto.getDependents().add(edDTO);
+      }
+      
+      dtos.add(dto);
+    }
+    
+    return dtos;
+  }
+  ...
+
+
+Controller
+----------------------------------------------------------------------------------------------------
+- Adicionar as seguintes linhas na classe 'EmployeeController'
+
+  ...
+  @GetMapping
+  ResponseEntity<List<EmployeeDTO>> findAll() {
+    List<EmployeeDTO> e = service.findAll();
+    return ResponseEntity.ok(e);
+  }
+  ...
+
+
+Verificando
+----------------------------------------------------------------------------------------------------
+- Iniciar o serviço 'employee'
+
+- Abrir o Postman, criar uma requisição do tipo GET para o endereço http://localhost:8080/employee
+
+

@@ -1,0 +1,78 @@
+====================================================================================================
+CURSO MICROSERVIÇOS SPRING BOOT - BUILDANDO
+====================================================================================================
+
+
+Construindo o módulo 'registry'
+----------------------------------------------------------------------------------------------------
+- Selecionar o módulo 'registry', botão direito, escolher Run As -> Maven Build
+
+- Na janela 'Edit Configuration', no campo 'Goals', digitar 'package'
+
+- Clicar no botão 'Apply' e depois no botão 'Run'
+
+- Selecionar a pasta 'target' e visualizar o arquivo 'regsitry-0.0.1-SNAPSHOT.jar'
+
+- Abrir um terminal e executar o seguinte comando
+
+  $ java -jar registry-0.0.1-SNAPSHOT.jar
+  
+  Obs: Será exibida uma mensagem informando que nenhum atributo de manifesto foi encontrado.
+  
+- Para resolver o problema, será necessário incluir o seguinte plugin
+
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  ...  
+
+- Selecionar o módulo 'registry', botão direito, escolher Run As -> Maven Build
+
+  Obs: Será gerado os seguintes arquivos: registry-0.0.1-SNAPSHOT.jar e registry-0.0.1-SNAPSHOT.jar.original
+
+
+Criando o container para o serviço 'registry'
+----------------------------------------------------------------------------------------------------
+- Criar o container usando o comando abaixo
+
+  $ sh create-container.sh
+  
+- Verificando o container recem criado
+
+  $ docker container ls
+  
+- Verificando os logs do container
+
+  $ docker logs registry-payroll  
+
+- Acessando o serviço 'registry'
+
+  http://localhost:8761
+  
+
+Construindo os demais módulos
+----------------------------------------------------------------------------------------------------
+- Adicionar o plugin 'spring-boot-maven-plugin' em todos os módulos
+
+  ...
+  <build>
+    <plugins>
+      <plugin>
+        <groupId>org.springframework.boot</groupId>
+        <artifactId>spring-boot-maven-plugin</artifactId>
+      </plugin>
+    </plugins>
+  </build>
+  ...  
+
+- Selecionar o projeto 'payroll-suite', botão direito, escolher Run As -> Maven Build
+
+  Obs: Todos os módulos serão contruidos automaticamente.
+
+
